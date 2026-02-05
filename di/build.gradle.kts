@@ -20,7 +20,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "shared"
+            baseName = "di"
             isStatic = true
         }
     }
@@ -35,6 +35,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -43,7 +48,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.nutrifysports.shared"
+    namespace = "com.nutrifysports.di"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -59,7 +64,7 @@ android {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.nutrifysports.shared.resources"
+    packageOfResClass = "com.nutrifysports.di.resources"
     generateResClass = always
 }
 
