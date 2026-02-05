@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +30,15 @@ import com.nutrifysports.shared.SurfaceError
 import com.nutrifysports.shared.TextPrimary
 import com.nutrifysports.shared.TextSecondary
 import com.nutrifysports.shared.TextWhite
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 import rememberMessageBarState
 
 @Composable
 fun AuthScreen() {
+    val scope = rememberCoroutineScope()
+    val viewModel = koinViewModel<AuthViewModel>()
     val rememberMessageBarState = rememberMessageBarState()
     var loadingState by remember { mutableStateOf(false) }
 
@@ -81,8 +87,13 @@ fun AuthScreen() {
                 GoogleButtonUiContainerFirebase(
                     linkAccount = false,
                     onResult = { result ->
-                        result.onSuccess { success ->
-                            rememberMessageBarState.addSuccess("Authentication successful!")
+                        result.onSuccess { user ->
+                           /* rememberMessageBarState.addSuccess("Authentication successful!")*/
+                            viewModel.createCustomer(
+                                user = user,
+                                onSuccess = { rememberMessageBarState.addSuccess("Authentication successful!")},
+                                onError = { message -> rememberMessageBarState.addError(message) }
+                            )
                             loadingState = false
                         }.onFailure { error ->
                             if (error.message?.contains("A network error") == true) {
