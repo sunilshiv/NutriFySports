@@ -24,15 +24,17 @@ import com.nutrifysports.shared.Alpha
 import com.nutrifysports.shared.BebasNeueFontFamily
 import com.nutrifysports.shared.FontSize
 import com.nutrifysports.shared.Surface
+import com.nutrifysports.shared.SurfaceBrand
+import com.nutrifysports.shared.SurfaceError
 import com.nutrifysports.shared.TextPrimary
 import com.nutrifysports.shared.TextSecondary
+import com.nutrifysports.shared.TextWhite
 import rememberMessageBarState
 
 @Composable
-fun AuthScreen(){
+fun AuthScreen() {
     val rememberMessageBarState = rememberMessageBarState()
     var loadingState by remember { mutableStateOf(false) }
-
 
     Scaffold { padding ->
         ContentWithMessageBar(
@@ -43,11 +45,18 @@ fun AuthScreen(){
                     bottom = padding.calculateBottomPadding()
                 ),
             messageBarState = rememberMessageBarState,
-            errorMaxLines = 2
+            errorMaxLines = 2,
+            errorContainerColor = SurfaceError,
+            errorContentColor = TextWhite,
+            successContainerColor = SurfaceBrand,
+            successContentColor = TextPrimary
         ) {
-            Column(modifier = Modifier.fillMaxSize()
-                .padding(24.dp)) {
-                Column(modifier = Modifier.weight(1f),
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(24.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -78,7 +87,7 @@ fun AuthScreen(){
                         }.onFailure { error ->
                             if (error.message?.contains("A network error") == true) {
                                 rememberMessageBarState.addError("Internet connection unavailable.")
-                            } else if(error.message?.contains("Idtoken is null") == true){
+                            } else if (error.message?.contains("Idtoken is null") == true) {
                                 rememberMessageBarState.addError("Sign in cancelled")
                             } else {
                                 rememberMessageBarState.addError(error.message ?: "Unknown")
