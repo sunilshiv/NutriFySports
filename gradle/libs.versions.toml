@@ -43,6 +43,9 @@ auth-kmp = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "auth
 auth-firebase-kmp = { module = "io.github.mirzemehdi:kmpauth-firebase", version.ref = "auth" }
 
 firebase-app = { module = "dev.gitlive:firebase-app", version.ref = "firebase" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebase" }
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebase" }
 
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }

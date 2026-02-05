@@ -20,7 +20,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "di"
+            baseName = "data"
             isStatic = true
         }
     }
@@ -36,12 +36,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.firebase.firestore)
+            implementation(libs.firebase.storage)
+            implementation(libs.auth.firebase.kmp)
 
-            implementation(project(path = ":feature:auth"))
-            implementation(project(path = ":data"))
+            implementation(project(path = ":shared"))
 
         }
         commonTest.dependencies {
@@ -51,7 +50,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.nutrifysports.di"
+    namespace = "com.nutrifysports.data"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -67,7 +66,7 @@ android {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.nutrifysports.di.resources"
+    packageOfResClass = "com.nutrifysports.data.resources"
     generateResClass = always
 }
 
