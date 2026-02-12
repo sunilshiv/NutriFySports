@@ -10,16 +10,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
+import com.nutrifysports.data.domain.CustomerRepository
+import com.nutrifysports.navigation.Screen
 import com.nutrifysports.navigation.SetupNavGraph
 import com.nutrifysports.shared.Constants
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-
+        val customerRepository = koinInject<CustomerRepository>()
         var appReady by remember { mutableStateOf(false) }
+        val isUserAuthenticated = remember { customerRepository.getCurrentUserId() != null }
+        val startDestination = remember {
+            if (isUserAuthenticated) Screen.HomeGraph
+            else Screen.Auth
+        }
 
         LaunchedEffect(Unit){
             GoogleAuthProvider.create(
@@ -31,7 +39,9 @@ fun App() {
             visible = appReady
         ) {
 
-            SetupNavGraph()
+            SetupNavGraph(
+                startDestination = startDestination
+            )
         }
     }
 }
