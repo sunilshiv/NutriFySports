@@ -36,7 +36,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import rememberMessageBarState
 
 @Composable
-fun AuthScreen() {
+fun AuthScreen(
+    navigateToHome: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     val viewModel = koinViewModel<AuthViewModel>()
     val rememberMessageBarState = rememberMessageBarState()
@@ -91,7 +93,13 @@ fun AuthScreen() {
                            /* rememberMessageBarState.addSuccess("Authentication successful!")*/
                             viewModel.createCustomer(
                                 user = user,
-                                onSuccess = { rememberMessageBarState.addSuccess("Authentication successful!")},
+                                onSuccess = {
+                                    scope.launch {
+                                        rememberMessageBarState.addSuccess("Authentication successful!")
+                                        delay(2000)
+                                        navigateToHome()
+                                    }
+                                            },
                                 onError = { message -> rememberMessageBarState.addError(message) }
                             )
                             loadingState = false
