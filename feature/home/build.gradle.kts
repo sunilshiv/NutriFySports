@@ -65,7 +65,7 @@ android {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.nutrifysports.auth.resources"
+    packageOfResClass = "com.nutrifysports.home.resources"
     generateResClass = always
 }
 
