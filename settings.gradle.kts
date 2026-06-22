@@ -14,6 +14,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+}
 
 dependencyResolutionManagement {
     repositories {
@@ -30,8 +33,6 @@ dependencyResolutionManagement {
 include(":data")
 include(":di")
 include(":feature:home")
-
-include(":navigation")
 include(":feature:auth")
 include(":navigation")
 include(":composeApp")

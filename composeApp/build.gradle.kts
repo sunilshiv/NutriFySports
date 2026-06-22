@@ -85,9 +85,30 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    flavorDimensions.add("environment")
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "BASE_URL", "\"https://api.dev.nutrifysports.com/\"")
+        }
+        create("qa") {
+            dimension = "environment"
+            versionNameSuffix = "-qa"
+            buildConfigField("String", "BASE_URL", "\"https://api.qa.nutrifysports.com/\"")
+        }
+        create("production") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"https://api.nutrifysports.com/\"")
+        }
+    }
 }
 
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-

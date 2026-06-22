@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
 import com.nutrifysports.data.domain.CustomerRepository
-import com.nutrifysports.navigation.Screen
+import com.nutrifysports.shared.domain.navigation.Screen
 import com.nutrifysports.navigation.SetupNavGraph
 import com.nutrifysports.shared.Constants
 import org.jetbrains.compose.ui.tooling.preview.Preview
