@@ -43,16 +43,16 @@ jobs:
           ls -l composeApp/google-services.json
 
       - name: Run Android Unit Tests
-        run: ./gradlew testDevDebugUnitTest --continue
+        run: ./gradlew testDebugUnitTest --continue
 
-      - name: Build Dev Debug APK
-        run: ./gradlew :composeApp:assembleDevDebug
+      - name: Build Debug APK
+        run: ./gradlew :composeApp:assembleDebug
 
-      - name: Upload Dev Debug APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: dev-debug-apk
-          path: composeApp/build/outputs/apk/dev/debug/*.apk
+          name: debug-apk
+          path: composeApp/build/outputs/apk/debug/*.apk
           if-no-files-found: ignore
 
   build-ios:
