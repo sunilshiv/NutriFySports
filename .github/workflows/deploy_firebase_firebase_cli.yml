@@ -1,0 +1,81 @@
+name: Firebase Deploy with Firebase CLI (Native)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 'Release notes for this build'
+        required: true
+        default: 'Triggered via Firebase CLI Manual'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for GitHub CLI to create releases
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Create google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" > composeApp/google-services.json
+
+      - name: Build Debug APK
+        run: ./gradlew :composeApp:assembleDebug
+
+      - name: Get Build Info
+        id: info
+        run: |
+          VERSION_TAG="v1.0.0-build-$(date +'%Y%m%d-%H%M')"
+          echo "tag=$VERSION_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release using GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.info.outputs.tag }}" \
+            composeApp/build/outputs/apk/debug/composeApp-debug.apk \
+            --title "Native CLI Build ${{ steps.info.outputs.tag }}" \
+            --notes "${{ github.event.inputs.release_notes }}" \
+            --target "${{ github.sha }}"
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy to Firebase App Distribution using Firebase CLI
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          CREDENTIAL_FILE_CONTENT: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+        run: |
+          # Save the service account credentials to a temporary file
+          echo "$CREDENTIAL_FILE_CONTENT" > firebase-key.json
+          
+          # Use the firebase-tools CLI directly
+          # GOOGLE_APPLICATION_CREDENTIALS tells the CLI which service account to use
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase-key.json
+          
+          firebase appdistribution:distribute composeApp/build/outputs/apk/debug/composeApp-debug.apk \
+            --app "$FIREBASE_APP_ID" \
+            --groups "testers" \
+            --release-notes "${{ github.event.inputs.release_notes }}"
+          
+          # Clean up
+          rm firebase-key.json
