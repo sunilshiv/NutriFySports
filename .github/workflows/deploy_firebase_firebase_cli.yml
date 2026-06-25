@@ -36,6 +36,10 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "Error: GOOGLE_SERVICES_JSON secret is empty."
+            exit 1
+          fi
           echo "$GOOGLE_SERVICES_JSON" > composeApp/google-services.json
 
       - name: Build Debug APK
@@ -65,17 +69,22 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           CREDENTIAL_FILE_CONTENT: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
         run: |
-          # Save the service account credentials to a temporary file
-          echo "$CREDENTIAL_FILE_CONTENT" > firebase-key.json
+          if [ -z "$CREDENTIAL_FILE_CONTENT" ]; then
+            echo "Error: CREDENTIAL_FILE_CONTENT secret is empty."
+            exit 1
+          fi
           
-          # Use the firebase-tools CLI directly
-          # GOOGLE_APPLICATION_CREDENTIALS tells the CLI which service account to use
-          export GOOGLE_APPLICATION_CREDENTIALS=firebase-key.json
+          # Write the service account to a file
+          echo "$CREDENTIAL_FILE_CONTENT" > "$GITHUB_WORKSPACE/firebase-key.json"
           
+          # Set the absolute path for authentication
+          export GOOGLE_APPLICATION_CREDENTIALS="$GITHUB_WORKSPACE/firebase-key.json"
+          
+          # Run the distribution command
           firebase appdistribution:distribute composeApp/build/outputs/apk/debug/composeApp-debug.apk \
             --app "$FIREBASE_APP_ID" \
             --groups "testers" \
             --release-notes "${{ github.event.inputs.release_notes }}"
           
-          # Clean up
-          rm firebase-key.json
+          # Cleanup
+          rm "$GITHUB_WORKSPACE/firebase-key.json"
