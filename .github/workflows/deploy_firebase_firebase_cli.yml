@@ -64,27 +64,26 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Deploy to Firebase App Distribution using Firebase CLI
+      - name: Deploy to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           CREDENTIAL_FILE_CONTENT: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
         run: |
           if [ -z "$CREDENTIAL_FILE_CONTENT" ]; then
             echo "Error: CREDENTIAL_FILE_CONTENT secret is empty."
             exit 1
           fi
           
-          # Write the service account to a file
-          echo "$CREDENTIAL_FILE_CONTENT" > "$GITHUB_WORKSPACE/firebase-key.json"
-          
-          # Set the absolute path for authentication
-          export GOOGLE_APPLICATION_CREDENTIALS="$GITHUB_WORKSPACE/firebase-key.json"
+          # Write the service account to a file using printf for safety
+          printf "%s" "$CREDENTIAL_FILE_CONTENT" > "$GOOGLE_APPLICATION_CREDENTIALS"
           
           # Run the distribution command
           firebase appdistribution:distribute composeApp/build/outputs/apk/debug/composeApp-debug.apk \
             --app "$FIREBASE_APP_ID" \
             --groups "testers" \
-            --release-notes "${{ github.event.inputs.release_notes }}"
+            --release-notes "${{ github.event.inputs.release_notes }}" \
+            --non-interactive
           
           # Cleanup
-          rm "$GITHUB_WORKSPACE/firebase-key.json"
+          rm "$GOOGLE_APPLICATION_CREDENTIALS"
